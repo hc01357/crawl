@@ -1,0 +1,54 @@
+# -*- coding:utf-8 -*-
+import urllib,re
+import xlwt
+
+url_list = []
+#获取源码
+def getdata():
+    for i in range(1,200):
+        url = 'http://furhr.com/?page={}'.format(i)
+        try:
+            html = urllib.urlopen(url).read()
+            print html
+        except Exception as e:
+            print e
+            continue
+
+        #正则表达式,
+        w = re.compile(r'<tr><td>\d+</td><td>\d+</td><td>(.*?)</td><td>(.*?)</td><td>(.*?)</td></tr>',re.S)
+        page_list = re.findall(w,html)
+        #加入compile可以提高编译效率
+        
+        url_list.append(page_list)
+        print page_list
+    return url_list
+
+def excel_write(items):
+    newTable = 'test123.xls'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('test1')
+    headData = ['公司名称','电话','地址']
+    for colnum in range(0,3):
+        #ws.write(0,colnum,headData[colnum],xlwt.easyxf('font:bold in'))
+        ws.write(0,colnum,headData[colnum],xlwt.easyxf('font:bold 1'))
+    wb.save(newTable)
+    print '创建成功'
+
+    #写入数据
+    index = 1
+    #print len(items)
+    for item in items:
+        #items是一个列表
+        for j in range(0,len(item)):
+            for i in range(0,3):  
+                ws.write(index,i,item[j][i])
+                print item[j][i]
+            index = index+1
+    wb.save(newTable)
+    #wb.close()
+                   
+items =getdata()     #爬虫模块
+excel_write(items)   #创建excel
+
+
+
